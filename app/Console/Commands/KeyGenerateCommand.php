@@ -36,11 +36,11 @@ class KeyGenerateCommand extends Command
         if (file_exists($path))
         {
             file_put_contents($path, str_replace(
-                $this->laravel['config']['app.key'], $key, file_get_contents($path)
+                config('app.key'), $key, file_get_contents($path)
             ));
         }
 
-        $this->laravel['config']['app.key'] = $key;
+        config(['app.key' => $key]);
         $this->info("Application key [$key] set successfully.");
     }
     /**

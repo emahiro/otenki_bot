@@ -25,8 +25,15 @@ $app = new Laravel\Lumen\Application(
 
 $app->withFacades();
 class_alias('App\Lib\Logger', 'Logger');
+class_alias('App\Lib\Slack', 'Slack');
 
 // $app->withEloquent();
+
+/**
+ * configure
+ */
+$app->configure('slack');
+$app->configure('area');
 
 /*
 |--------------------------------------------------------------------------

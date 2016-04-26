@@ -5,6 +5,10 @@ use Log;
 
 class Logger{
 
+    public static function out($str){
+        Log::debug($str);
+    }
+
     public static function info(string $str)
     {
         Log::info($str);
