@@ -29,7 +29,7 @@ class GetWeatherCommand extends Command{
         $hour = date('H') + 9;
         Logger::out($hour);
         $weather_data = [];
-
+        
         switch (true) {
             case $hour <= Self::MORNING:
                 $weather_data = $this->morning();
@@ -120,10 +120,14 @@ class GetWeatherCommand extends Command{
 
                 if ($item->dateLabel === '今日') {
 
+                    $telop = $item->telop;
+                    $img_url = $item->image->url;
                     $max_temperature = $item->temperature->max->celsius;
 
                     $res = [
                         'dayPeriod' => '【今日の天気】',
+                        'telop' => $telop,
+                        'img' => $img_url,
                         'temperature' => '最高気温 : '.$max_temperature.'℃',
                         'description' => (string)$description,
                     ];
