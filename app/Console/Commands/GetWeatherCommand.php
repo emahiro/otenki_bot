@@ -20,6 +20,7 @@ class GetWeatherCommand extends Command{
     const AFTERNOON = 12;
     const EVENING = 18;
 
+
     protected $name = 'weather:get';
     protected $description = 'request Weatherhack Api and get weather Data';
 
@@ -34,11 +35,11 @@ class GetWeatherCommand extends Command{
                 $weather_data = $this->morning();
                 break;
 
-            case Self::AFTERNOON < $hour && $hour <= Self::EVENING:
+            case Self::AFTERNOON < $hour && $hour < Self::EVENING:
                 $weather_data = $this->afternoon();
                 break;
 
-            case Self::EVENING < $hour:
+            case Self::EVENING <= $hour:
                 $weather_data = $this->evening();
                 break;
 
@@ -122,9 +123,9 @@ class GetWeatherCommand extends Command{
                     $max_temperature = $item->temperature->max->celsius;
 
                     $res = [
-                        'dayPeriod' => '今日の天気',
-                        'description' => (string)$description,
+                        'dayPeriod' => '【今日の天気】',
                         'temperature' => '最高気温 : '.$max_temperature.'℃',
+                        'description' => (string)$description,
                     ];
                 }
 
@@ -133,11 +134,11 @@ class GetWeatherCommand extends Command{
                 case Self::AFTERNOON:
 
                     if ($item->dateLabel === '今日') {
-                        $max_temperature = $item->temperature->max->celsius;
+                        // $max_temperature = $item->temperature->max->celsius;
 
                         $res = [
-                            'dayPeriod' => '午後の天気',
-                            'temperature' => '最高気温 : '.$max_temperature.'℃',
+                            'dayPeriod' => '【午後の天気】',
+                            // 'temperature' => '最高気温 : '.$max_temperature.'℃',
                         ];
                     }
 
@@ -149,11 +150,15 @@ class GetWeatherCommand extends Command{
 
                         $max_temperature = $item->temperature->max->celsius;
                         $min_temperature = $item->temperature->min->celsius;
+                        $telop = $item->telop;
+                        $img_url = $item->image->url;
 
                         $res = [
-                            'dayPeriod' => '明日の天気',
-                            'description' => (string)$description,
-                            'temperature' =>$max_temperature.'℃ / '.$min_temperature.'℃',
+                            'dayPeriod' => '【明日の天気】',
+                            'telop' => $telop,
+                            // 'description' => (string)$description,
+                            'temperature' =>'気温 : '.$max_temperature.'℃ / '.$min_temperature.'℃',
+                            'img_url' => $img_url
                         ];
                     }
 
@@ -183,6 +188,7 @@ class GetWeatherCommand extends Command{
                 case $day_time <= Self::MORNING;
 
                     $rain = [
+                        'dayPeriod' => '【降水確率】',
                         'morning' => '午前中の降水確率 : '.$period[1].'%',
                         'afternoon' => '午後の降水確率 : '.$period[2].'%',
                         'evening' => '帰る時間の降水確率 : '.$period[3].'%'
@@ -193,6 +199,7 @@ class GetWeatherCommand extends Command{
                 case $day_time <= Self::AFTERNOON:
 
                     $rain = [
+                        'dayPeriod' => '【降水確率】',
                         'afternoon' => '午後の降水確率 : '.$period[2].'%',
                         'evening' => '帰る時間の降水確率 : '.$period[3].'%'
                     ];
@@ -202,6 +209,7 @@ class GetWeatherCommand extends Command{
                 case $day_time <= Self::EVENING:
 
                     $rain = [
+                        'dayPeriod' => '【降水確率】',
                         'evening' => '帰る時間の降水確率 : '.$period[3].'%'
                     ];
 
