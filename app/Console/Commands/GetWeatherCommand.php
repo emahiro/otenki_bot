@@ -20,25 +20,33 @@ class GetWeatherCommand extends Command{
     const AFTERNOON = 12;
     const EVENING = 18;
 
-
     protected $name = 'weather:get';
     protected $description = 'request Weatherhack Api and get weather Data';
 
     public function fire(){
         // お天気のAPIを取得する
         $hour = date('H') + 9;
+
+        // 24時を超えた場合に日本時間に換算するために24を引く。
+        if ($hour > 24) {
+            $hour = $hour - 24;
+        }
+
         Logger::out($hour);
         $weather_data = [];
-        
+
         switch (true) {
+            // 朝の天気通知
             case $hour <= Self::MORNING:
                 $weather_data = $this->morning();
                 break;
 
-            case Self::AFTERNOON < $hour && $hour < Self::EVENING:
+            // 昼の天気通知
+            case Self::MORNING < $hour && $hour < Self::EVENING:
                 $weather_data = $this->afternoon();
                 break;
 
+            // 夜の天気通知
             case Self::EVENING <= $hour:
                 $weather_data = $this->evening();
                 break;
@@ -85,16 +93,9 @@ class GetWeatherCommand extends Command{
                 $payload = [
                     'text' => $item
                 ];
-
                 Slack::send($payload, $webhook_url);
             }
         }
-
-        // $payload = [
-        //     "channel" => $channel,
-        //     "user_name" => $user_name,
-        //     "text" => 'test'
-        // ];
     }
 
     /**
@@ -132,28 +133,26 @@ class GetWeatherCommand extends Command{
                         'description' => (string)$description,
                     ];
                 }
-
                 break;
 
                 case Self::AFTERNOON:
-
                     if ($item->dateLabel === '今日') {
-                        // $max_temperature = $item->temperature->max->celsius;
+
+                        $max_temperature = isset($item->temperature->max->celsius) ? $item->temperature->max->celsius : '--' ;
 
                         $res = [
                             'dayPeriod' => '【午後の天気】',
-                            // 'temperature' => '最高気温 : '.$max_temperature.'℃',
+                            'temperature' => '最高気温 : '.$max_temperature.'℃',
                         ];
                     }
-
                     break;
 
                 case Self::EVENING:
 
                     if ($item->dateLabel === '明日') {
 
-                        $max_temperature = $item->temperature->max->celsius;
-                        $min_temperature = $item->temperature->min->celsius;
+                        $max_temperature = isset($item->temperature->max->celsius) ? $item->temperature->max->celsius : '--';
+                        $min_temperature = isset($item->temperature->min->celsius) ? $item->temperature->min->celsius : '--';
                         $telop = $item->telop;
                         $img_url = $item->image->url;
 
@@ -165,7 +164,6 @@ class GetWeatherCommand extends Command{
                             'img_url' => $img_url
                         ];
                     }
-
                     break;
             }
         }
